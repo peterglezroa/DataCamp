@@ -100,6 +100,8 @@ sns.catplot(data=tips, kind="bar", x="day", y="total_bill", ci=None)
 #### Box plot
 * Shows the distribution of quantitive data.
 * See median, spread, skewness and outliers
+
+* You can use **beeswarm plot** to see where the datapoints land
 ```python
 sns.catplot(data=tips, kind="box", x="time", y="total_bill")
 
@@ -109,6 +111,14 @@ sns.catplot(data=tips, kind="box", x="time", y="total_bill", whis=[5, 95])
 
 # To omit outliers: sym=""
 sns.catplot(data=tips, kind="box", x="time", y="total_bill", sym="")
+```
+
+#### BeeSwarm plot
+```python
+pollution_nov = pollution[pollution.month == 10]
+
+sns.swarmplot(y="city", x="O3", data=pollution_nov, size=4)
+plt.xlabel("Ozone (O3)")
 ```
 
 #### Point plot
@@ -129,6 +139,23 @@ sns.catplot(data=masculinity_data, kind="point", x="age",
 # To remove the joints between points:
 sns.catplot(data=masculinity_data, kind="point", x="age",
   y="masculinity_important", joints=False)
+```
+
+#### KDE plots
+* Values over defined number of intervals
+```python
+# Filter dataset to the year 2012
+sns.kdeplot(pollution[pollution.year == 2012].O3, 
+            # Shade under kde and add a helpful label
+            shade = True,
+            label = '2012')
+
+# Filter dataset to everything except the year 2012
+sns.kdeplot(pollution[pollution.year != 2012].O3, 
+            # Again, shade under kde and add a helpful label
+            shade = True,
+            label = 'other years')
+plt.show()
 ```
 
 ### Adding titles and labels
@@ -184,6 +211,12 @@ sns.set_style("whitegrid")
 # - "Blues", bluescale
 sns.set_palette("RdBu")
 
+# Or Define a custom continuous color palette with as_cmap
+# Also: dark_palette, or color_pallete("red:blue")
+color_palette = sns.light_palette('orangered', as_cmap = True)
+sns.scatterplot(x = 'CO', y = 'NO2', hue = 'O3', data = cinci_2014,
+  palette = color_palette)
+
 # CHANGE SCALE
 # Preset options (smallest to largest): "paper", "notebook", "talk", "poster"
 sns.set_context("notebook")
@@ -206,4 +239,72 @@ sns.relplot(x="total_bill", y="tip", data=tips, kind="scatter",
 # CHANGE TRANSPARENCY
 sns.relplot(x="total_bill", y="tip", data=tips, kind="scatter",
   alpha=0.4)
+
+# REMOVE BORDERS
+sns.despine(top=True, right=True, left=True, bottom=True)
+
+# CHANGING FONT SIZE
+sns.set(font_scale = 2)
+```
+
+### Hightlight an specific point
+```python
+houston_pollution = pollution[pollution.city  ==  'Houston'].copy()
+
+# Find the highest observed O3 value
+max_O3 = houston_pollution.O3.max()
+
+# Make a column that denotes which day had highest O3
+houston_pollution["point_type"] = ['Highest O3 Day' if O3  ==  max_O3 else 'Others' for O3 in houston_pollution.O3]
+
+# Encode the hue of the points with the O3 generated column
+sns.scatterplot(x = 'NO2',
+                y = 'SO2',
+                hue = "point_type",
+                data = houston_pollution)
+plt.show()
+
+# Or multiple points
+# Make a vector where Long Beach is orangered; else lightgray
+is_lb = ['orangered' if city  ==  'Long Beach' else 'lightgray' for city in pollution['city']]
+
+# Map facecolors to the list is_lb and set alpha to 0.3
+sns.regplot(x = 'CO',
+            y = 'O3',
+            data = pollution,
+            fit_reg = False, 
+            scatter_kws = {'facecolors': is_lb, "alpha": 0.3})
+plt.show()
+```
+
+### Annotations
+
+#### Text
+```python
+sns.scatterplot(x="NO2", y="SO2", data=houston_pollution)
+
+# X: 13, Y: 33
+plt.text(13, 33, "Look at this outlier",
+  fontdict={"ha": "left", "size": "x-large"})
+```
+
+#### Text with arrow
+```python
+sns.scatterplot(x="NO2", y="SO2", data=houston_pollution)
+
+plt.annotate("A buried point to look at", xy=(45.5, 11), xytext=(60, 22),
+  arrowprops={"facecolor": "grey", "width": 3}, backgroundcolor="white")
+```
+
+### Multiple subplots
+```python
+# Create a subplot of one row & two cols
+f, (ax1, ax2) = plt.subplots(1,2)
+
+sns.lineplot("month", "NO2", "year", ax=ax1, data=pol_by_month, palette="RdBu", ax = ax1)
+sns.barplot("year", "count", ax=ax2, data=obs_by_year, palette="RdBu", ax = ax2)
+
+# To remove legends:
+ax1.legend_.remove()
+ax2.legend_.remove()
 ```

@@ -170,6 +170,11 @@ fig.set_size_inches([5, 3]) # Width 5, Height 3
 fig.savefig("gold_medals.png")
 ```
 
+### Plot pair of data into multiple plots
+```python
+sns.pairplot(data=df)
+```
+
 ### Check later
 * [3d visualizations](https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html)
 * [images] (https://matplotlib.org/users/image_tutorial.html)
