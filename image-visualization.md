@@ -217,6 +217,34 @@ show_image(image_with_logo, 'Image with logo')
 show_image(image_logo_removed, 'Image with logo removed')
 ```
 
+## Noise
+Errors in the results of the image acquisition process.
+
+### Apply noise in scikit
+```python
+from skimage.util import random_noise
+
+noisy_image = random_noise(dog_image)
+```
+
+### Reducing noise
+1. **Total Variation (TV)**:
+Tries to minimize the total variation of the image.
+```python
+from skimage.restoration import denoise_tv_chambolle
+
+denoised_image = denoise_tv_chambolle(noisy_image,weight=0.1,multichannel=True)
+```
+
+0. **Bilateral**:
+Smooths images while preserving edges. It replaces the intensity of each pixel
+with a weighted average of intensity values from nearby pixels.
+```python
+from skimage.restoration import denoise_bilateral 
+
+denoised_image = denoise_bilateral(noisy_image, multichannel=True)
+```
+
 [contrast]: ./imgs/image-visualization-contrast.png
 [contrast enhancement]: ./imgs/image-visualization-contrast_enhancement.png
 [structuring element]: ./imgs/image-visualization-structuring_element.png
